@@ -41,12 +41,6 @@
 -(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
     NSURL *downloadedURL = downloadTask.currentRequest.URL;
-    [self.downloadingURLs removeObject:downloadedURL];
-    [self.downloadedURLs addObject:downloadedURL];
-    
-    if ([self.downloadingURLs count] == 0) {
-        self.downloadsInProgress = NO;
-    }
     
     NSFileManager *defaultFileManager = [NSFileManager defaultManager];
   
@@ -54,6 +48,23 @@
     [defaultFileManager moveItemAtURL:location toURL:destinationURL error:nil];
     
     NSLog(@"Moved file from %@ to %@", location, destinationURL);
+    
+    [self completeURLDownload:downloadedURL];
+    
+    if ([self.downloadingURLs count] == 0) {
+        self.downloadsInProgress = NO;
+    }
+}
+
+- (void)completeURLDownload:(NSURL *)downloadedURL
+{
+    for (NSURL *url in self.downloadingURLs) {
+        if ([[downloadedURL absoluteString] isEqualToString:[url absoluteString]])
+        {
+            [self.downloadingURLs removeObject:url];
+            [self.downloadedURLs addObject:downloadedURL];
+        }
+    }
 }
 
 //The urls array will contain an array of NSURL’s. The method should return immediately, eg, it’s an asynchronous API call that will run in the background.
@@ -76,12 +87,11 @@
         return;
     }
     
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        while (self.downloadsInProgress) {
-            // do nothing
-        }
-        return;
-    }];
+    while (self.downloadsInProgress) {
+        [NSThread sleepForTimeInterval:1.0];
+    }
+    
+    NSLog(@"Blocker finished");
 }
 
 //Return the path where the given url was downloaded to.

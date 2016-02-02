@@ -19,10 +19,15 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     NSMutableArray *urls = [[NSMutableArray alloc] init];
-    [urls addObject:[NSURL URLWithString:@"http://www.jlazar.com"]];
+    [urls addObject:[NSURL URLWithString:@"http://www.jlazar.com/"]];
+//    [urls addObject:[NSURL URLWithString:@"http://ewalti.com/"]];
     
     URLPuller *puller = [[URLPuller alloc] init];
     [puller downloadUrlsAsync:urls];
+    
+    [puller waitUntilAllDownloadsFinish];
+    
+    NSLog(@"Called after wait until all downloads done");
     
     return YES;
 }

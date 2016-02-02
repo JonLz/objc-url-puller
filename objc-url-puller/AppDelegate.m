@@ -24,6 +24,7 @@
     
     URLPuller *puller = [[URLPuller alloc] init];
     [puller downloadUrlsAsync:urls];
+    NSLog(@"%@", [puller downloadedPathForURL:[NSURL URLWithString:@"http://www.jlazar.com/"]]);
     
     [puller waitUntilAllDownloadsFinish];
     

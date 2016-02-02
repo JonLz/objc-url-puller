@@ -100,11 +100,22 @@
 
 - (NSString*) downloadedPathForURL: (NSURL*)url
 {
-    if (![self.downloadedURLs containsObject:url]) {
+    if (![self urlIsDownloading:url]) {
         return nil;
     }
     
     return [self destinationPathForURL:url];
+}
+
+- (BOOL) urlIsDownloading:(NSURL *)downloadingURL
+{
+    for (NSURL *url in self.downloadingURLs) {
+        if ([[downloadingURL absoluteString] isEqualToString:[url absoluteString]])
+        {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (NSString *) destinationPathForURL:(NSURL *)url
